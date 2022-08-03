@@ -1,0 +1,68 @@
+<template>
+    <div class="todo">
+        <h1>ToDo List!</h1>
+        <h4>Pendientes ({{pending.length}})</h4>
+        <div class="tasks">
+            <div v-for="task in pending" :key="task.id" class="task">
+                <p>{{task.text}}</p>
+                <input @change="toggleTodo(task)" v-model="task.done" type="checkbox" name="done" id="">
+            </div>
+        </div>
+        <h4>Completadas ({{done.length}})</h4>
+        <div class="tasks">
+            <div v-for="task in done" :key="task.id" class="task -completed">
+                <p>{{task.text}}</p>
+                <input @change="toggleTodo(task)" v-model="task.done" type="checkbox" name="done" id="">
+            </div>
+        </div>
+        <br>
+        <br>
+        <h1>Alternative ToDo List!</h1>
+        <div class="buttons">
+            <button @click="status = 'all'" >Get all tasks</button>
+            <button @click="status = 'done'" >Get done tasks</button>
+            <button @click="status = 'pending'" >Get pending tasks</button>
+        </div>
+        <br>
+        <br>
+
+        <div class="tasks">
+            <div v-for="task in getTodosByStatus" :key="task.id" :class="{'-completed': task.done}" class="task">
+                <p>{{task.text}}</p>
+                <input @change="toggleTodo(task)" v-model="task.done" type="checkbox" name="done" id="">
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+    import { computed, ref } from 'vue';
+    import { useStore } from 'vuex';
+    
+    const store = useStore();
+    const status = ref('all');
+
+    const toggleTodo = (task) => {
+        store.dispatch('toggleTodo', task);
+    }
+
+    const pending = computed(() => {
+        return store.getters['pendingTodos']
+    });
+
+    const done = computed(() => {
+        return store.getters['doneTodos']
+    });
+
+    const getTodosByStatus = computed(() => {
+        return store.getters['getTodosByStatus'](status.value)
+    });
+</script>
+
+<style scoped>
+    .buttons{
+        display: flex;
+        gap: 20px;
+    }
+</style>
+
